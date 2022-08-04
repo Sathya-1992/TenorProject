@@ -1,0 +1,190 @@
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+html{
+    font-size: 10px;
+}
+body{
+    font-size: 1.6rem;
+    font-family: Inter var,helvetica,arial,sans-serif;
+    overflow: hidden;
+}
+:root{
+    --trendingLeft :0;
+}
+.container{
+    height: 100vh;
+    width: 100vw;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    overflow: auto;
+}
+nav{
+    background-color: #fff;
+    border-bottom: 1px solid #ebf2f7;
+    width: 100%;
+}
+.marginAlign{
+    width: 61%;
+    margin: 0 auto;
+}
+.headerMargin{
+    padding: 0.8rem 0rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+img[alt="Tenor"], img[alt="tenorWhite"]{
+    width: 8rem;
+    height: 2.2rem;
+}
+.flex{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.navBar{
+    gap: 2rem;
+}
+img[alt="upload"]{
+    width: 2rem;
+    height: 2rem;
+}
+.navBar button{
+    background-color: #007add;
+    border: none;
+    border-radius: 3px;
+    padding: 0.6rem 1rem;
+    gap: 0.5rem;
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 8%), 0 4px 6px 0 rgb(83 83 92 / 11%);
+}
+.notify{
+    border: 1px solid;
+    border-radius: 50%;
+    padding: 0.7rem;
+}
+img[alt="notification"], img[alt="account"]{
+    width: 1.8rem;
+    height: 1.8rem;
+}
+img[alt="menu"]{
+    width: 4rem;
+    height: 3rem;
+}
+header{
+    background-image: linear-gradient(90deg,#4cafff,#2e93e6);
+    height: 7.5rem;
+    padding: 1.2rem 0rem;
+    position: sticky;
+    top: 0;
+}
+.searchPosition{
+    position: relative;
+}
+img[alt="tenorWhite"]{
+    position: absolute;
+    top: 1.2rem;
+    left: 0;
+}
+.searchBar{
+    height: 5rem;
+    background-color: #fff;
+    position: absolute;
+    right:0;
+    left: 0;
+}
+input{
+    height: 100%;
+    width: 100%;
+    border-radius: 0.3rem;
+    border: 1px solid #e8e8e8;
+    box-shadow: 0 2px 2px 0 rgb(0 0 0 / 16%), 0 0 1px 0 rgb(0 0 0 / 8%);
+    font-family: Inter,helvetica,arial,sans-serif;
+    font-weight: 600;
+    color: #171717;
+    padding: 1.2rem 2rem;
+    position: relative;
+    font-size: inherit;
+}
+::placeholder{
+    color: #bbb9b9;
+}
+img[alt="search"]{
+    position: absolute;
+    right:1.5rem;
+    width: 2rem;
+    height: 2rem;
+}
+#homePage,.trending{
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 2rem;
+}
+#homePage{
+    padding: 3rem 0rem;
+}
+.trendContainer{
+    position: relative;
+}
+#tenor{
+    height: 14rem;
+    margin: 0 -1rem;
+    overflow: hidden;
+    position: relative;
+    white-space: nowrap;
+}
+#parentTenor{
+    position: absolute;
+    left: calc(var(--trendingLeft)*(1px));
+    transition: left .3s linear;
+    width: 100%;
+}
+.imageAlign{
+    display: inline-block;
+    margin: 0 1rem;
+    position: relative;
+    width: calc(20% - 2rem);
+    cursor: pointer;
+}
+.trendingGif{
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 10px 0 rgb(0 0 0 / 5%), 0 2px 4px 0 rgb(0 0 0 / 8%);
+    height: 9rem;
+    position: relative;
+    width: 100%;
+    object-fit: cover;
+} 
+.trendingGif:hover{
+    box-shadow: 0 7px 14px rgb(50 50 93 / 10%), 0 3px 6px rgb(0 0 0 / 8%);
+    opacity: 0.9;
+}
+.imgNameAlign{
+    padding-top: 0.7rem;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.prevButton, .nextButton{
+    position: absolute;
+    top: 4.8rem;
+    opacity: 0.3;
+    cursor: pointer;
+}
+.prevButton{
+    left: -2.5rem;
+    display: none;
+}
+.nextButton{
+    right: -2.5rem;
+}
+img[alt="previous"], img[alt="next"]{
+    width: 1.7rem;
+    height: 1.7rem;
+}
+.trendContainer:hover .prevButton,.trendContainer:hover .nextButton{
+    opacity: 1;
+}

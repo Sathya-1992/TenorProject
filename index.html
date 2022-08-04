@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <title>Tenor GIF</title>
+</head>
+<body>
+    <div class="container" id="container">
+        <nav>
+            <div class="headerMargin marginAlign">
+                <img src="./Image/tenor-logo.svg" alt="Tenor">
+                <div class="navBar flex">
+                    <button class="flex">
+                        <img src="./Image/upload.png" alt="upload">
+                        <span>UPLOAD</span>
+                    </button>
+                    <div class="flex notify">
+                        <img src="./Image/notification.png" alt="notification">
+                    </div>
+                    <div class="flex notify">
+                        <img src="./Image/account.png" alt="account">
+                    </div>
+                    <div class="flex">
+                        <img src="./Image/menu.png" alt="menu">
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <header>
+            <div class="marginAlign searchPosition">
+                <img src="./Image/tenor-logo-white.svg" alt="tenorWhite">
+                <div class="searchBar flex">
+                    <input placeholder="Search for GIFs and Stickers">
+                    <img src="./Image/search.png" alt="search">
+                </div>
+            </div>
+        </header>
+        <main id="homePage" class="marginAlign">
+            <div class="trending">
+                <h2>Trending Tenor Searches</h2>
+                <div class="trendContainer">
+                    <div id="tenor">
+                        <div id="parentTenor"></div>
+                    </div>
+                    <div class="prevButton flex" onclick="movePreviousTrendingGifs()">
+                        <img src="./Image/prevButton.png" alt="previous">
+                    </div>
+                    <div class="nextButton flex" onclick="moveNextTrendingGifs()">
+                        <img src="./Image/nextButton.png" alt="next">
+                    </div>
+                </div>
+            </div>
+            <div class="trending">
+                <h2>Featured GIFs</h2>
+                <div></div>
+            </div>
+        </main>
+        <!-- <main id="searchPage marginAlign"></main> -->
+    </div>
+    <script type="text/javascript" src="./script.js"></script>
+</body>
+</html>
