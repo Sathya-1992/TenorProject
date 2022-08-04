@@ -12,8 +12,11 @@ var previousClickCount;
 var nextButton = document.querySelector(".nextButton");
 var prevButton = document.querySelector(".prevButton");
 var searchEle = document.getElementById("searchInput");
+var homePageEle = document.getElementById("homePage");
+var searchPageEle =document.getElementById("searchPage");
 var searchValue;
 var colors = ["rgb(166, 179, 139)","rgb(139, 152, 179)","rgb(152, 139, 179)","rgb(139, 179, 152)","rgb(139, 166, 179)","rgb(179, 179, 139)","rgb(179, 139, 179)","rgb(152, 139, 179)"]
+var trendId = 1;
 
 window.onload = async function(){
     let trendingGifs = await handleSearchTrendingGifs();
@@ -38,6 +41,8 @@ function renderTrendyGifs(data){
 function appendTagInfo(parentEle,imageName,imageUrl){
     let divEle = document.createElement("div");
     divEle.classList.add("imageAlign");
+    divEle.id = "trend"+trendId;
+    divEle.setAttribute("onclick","showSelectedTopic(this.id)");
     let imageEle = document.createElement("img");
     imageEle.setAttribute("src",imageUrl);
     imageEle.classList.add("trendingGif");
@@ -48,6 +53,7 @@ function appendTagInfo(parentEle,imageName,imageUrl){
     divEle.appendChild(imageEle);
     divEle.appendChild(nameEle);
     parentEle.appendChild(divEle);
+    trendId++;
 }
 
 function getLeftValue(){
@@ -86,9 +92,19 @@ function updateButtonDisplay(){
     }
 }
 
+function showSelectedTopic(elementId){
+    let searchName = document.getElementById(elementId).lastChild.textContent;
+    searchEle.value= searchName;
+    document.getElementById("searchBtn").click();
+}
+
 renderSearchItem = async function(){
+    homePageEle.style.display = "none";
+    searchPageEle.style.display = "grid";
     let searchSuggestion = await handleSearchSuggestion();
+    let stickers = await handleSearchStickers();
     renderSearchSuggestion(searchSuggestion);
+    renderSearchStickers(stickers);
 }
 
 function handleSearchSuggestion(){
@@ -102,6 +118,8 @@ function handleSearchSuggestion(){
 function renderSearchSuggestion(data){
     let headerEle = document.querySelector(".headerTags");
     headerEle.innerHTML="";
+    let headerValue = changeUpperCase();
+    document.getElementById("heading").textContent = headerValue;
     let names = data.results || [];
     names.forEach((name) => {
         appendSearchRelatedInfo(headerEle,name);
@@ -109,8 +127,6 @@ function renderSearchSuggestion(data){
 }
 
 function appendSearchRelatedInfo(parentEle,value){
-    let headerValue = changeUpperCase();
-    document.getElementById("heading").textContent = headerValue;
     let listEle = document.createElement("li");
     let index = getRandomNumber(0,colors.length);
     listEle.style.backgroundColor = colors[index];
@@ -133,6 +149,14 @@ function getRandomNumber(min,max){
     return index;
 }
 
+function handleSearchStickers(){
+
+}
+
+function renderSearchStickers(data){
+
+}
+
 // const containerElement = document.getElementById('container');
 //     const navElement = document.getElementsByTagName("nav")[0];
 
@@ -142,7 +166,15 @@ function getRandomNumber(min,max){
 //         let navElementHeight = navElement.offsetHeight;
         
 //         if(containerScrollTop > navElementHeight){
+                // root.style.setProperty("--inputPosition","30rem");
 //         } else{
-
+                    // root.style.setProperty("--inputPosition","0");
 //         }
 //     });
+
+searchEle.addEventListener("keypress",function(event){
+    if(event.key === "Enter"){
+      event.preventDefault();
+      document.getElementById("searchBtn").click();
+    }
+  });

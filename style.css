@@ -14,6 +14,8 @@ body{
 :root{
     --trendingLeft :0;
     --headerNameColor :rgb(166, 179, 139);
+    --stickerLeft :0;
+    --inputPosition :0;
 }
 .container{
     height: 100vh;
@@ -41,6 +43,7 @@ nav{
 img[alt="Tenor"], img[alt="tenorWhite"]{
     width: 8rem;
     height: 2.2rem;
+    cursor: pointer;
 }
 .flex{
     display: flex;
@@ -97,7 +100,8 @@ img[alt="tenorWhite"]{
     background-color: #fff;
     position: absolute;
     right:0;
-    left: 0;
+    left: var(--inputPosition);
+    transition: left .3s linear;
 }
 input{
     height: 100%;
@@ -128,7 +132,7 @@ img[alt="search"]{
 #homePage, .trending{
     grid-template-rows: auto 1fr;
 }
-#homePage{
+#searchPage{
     display: none;
 }
 #homePage, #searchPage{
@@ -137,23 +141,27 @@ img[alt="search"]{
 #searchPage{
     grid-template-rows: auto auto 1fr;
 }
-.trendContainer{
+.trendContainer,.stickerContainer{
     position: relative;
 }
-#tenor{
-    height: 14rem;
-    margin: 0 -1rem;
+#tenor,.stickerParent{
     overflow: hidden;
     position: relative;
     white-space: nowrap;
 }
+#tenor{
+    height: 14rem;
+    margin: 0 -1rem;
+}
 #parentTenor{
-    position: absolute;
     left: calc(var(--trendingLeft)*(1px));
+}
+#parentTenor,#stickerData{
+    position: absolute;
     transition: left .3s linear;
     width: 100%;
 }
-.imageAlign{
+.imageAlign,.stickerAlign{
     display: inline-block;
     margin: 0 1rem;
     position: relative;
@@ -219,4 +227,34 @@ ul{
     font-weight: 600;
     padding: 1rem 2rem;
     text-transform: uppercase;
+}
+.stickerContainer{
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2rem;
+}
+.stickerParent{
+    height: 200px;
+    margin: 0 0 0 -1rem;
+    width: 100%;
+}
+#stickerData{
+    left: calc(var(--stickerLeft)*(1px));
+}
+.stickerAlign{
+    height: 18.2rem;
+}
+.buttons{
+    border-radius: 5px;
+    box-shadow: 0 4px 10px 0 rgb(0 0 0 / 5%), 0 2px 4px 0 rgb(0 0 0 / 8%);
+    display: flex;
+    flex-direction: column;
+    height: 18.2rem;
+    width: 10rem;
+}
+.prevSticker, .nextSticker{
+    border-radius: 5px;
+    flex-grow: 1;
+    position: relative;
+    width: 100%;
 }
