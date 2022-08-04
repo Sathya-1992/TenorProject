@@ -119,13 +119,21 @@ img[alt="search"]{
     width: 2rem;
     height: 2rem;
 }
-#homePage,.trending{
+#homePage,.trending, #searchPage{
     display: grid;
-    grid-template-rows: auto 1fr;
     gap: 2rem;
 }
+#homePage, .trending{
+    grid-template-rows: auto 1fr;
+}
 #homePage{
+    display: none;
+}
+#homePage, #searchPage{
     padding: 3rem 0rem;
+}
+#searchPage{
+    grid-template-rows: auto auto 1fr;
 }
 .trendContainer{
     position: relative;
@@ -161,6 +169,7 @@ img[alt="search"]{
 .trendingGif:hover{
     box-shadow: 0 7px 14px rgb(50 50 93 / 10%), 0 3px 6px rgb(0 0 0 / 8%);
     opacity: 0.9;
+    transform: translateY(-1px);
 }
 .imgNameAlign{
     padding-top: 0.7rem;

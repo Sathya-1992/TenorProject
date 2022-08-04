@@ -82,6 +82,27 @@ function updateButtonDisplay(){
         nextButton.style.display="block";
     }
 }
+
+renderSearchItem = async function(){
+    let searchSuggestion = await handleSearchSuggestion();
+    renderSearchSuggestion(searchSuggestion);
+}
+
+function handleSearchSuggestion(){
+    let searchTerm = document.getElementById("searchInput").value;
+    let url = apiDomain+"/v2/search_suggestions?key="+apiKey+"&q="+searchTerm;
+    return fetch(url).then(function(res){
+        return res.json();
+    });
+}
+  
+function renderSearchSuggestion(data){
+    let names = data.results || [];
+    names.forEach((name) => {
+        console.log(name);
+    })
+}
+
 // const containerElement = document.getElementById('container');
 //     const navElement = document.getElementsByTagName("nav")[0];
 
