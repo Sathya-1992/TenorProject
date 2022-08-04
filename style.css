@@ -13,6 +13,7 @@ body{
 }
 :root{
     --trendingLeft :0;
+    --headerNameColor :rgb(166, 179, 139);
 }
 .container{
     height: 100vh;
@@ -20,6 +21,7 @@ body{
     display: grid;
     grid-template-rows: auto auto 1fr;
     overflow: auto;
+    white-space: nowrap;
 }
 nav{
     background-color: #fff;
@@ -196,4 +198,25 @@ img[alt="previous"], img[alt="next"]{
 }
 .trendContainer:hover .prevButton,.trendContainer:hover .nextButton{
     opacity: 1;
+}
+h1{
+    font-size: 3.5rem;
+}
+ul{
+    list-style: none;
+    overflow: hidden;
+}
+.headerTags{
+    display: flex;
+    gap: 2rem;
+}
+.listAlign{
+    /* background-color: var(--headerNameColor); */
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 8%), 0 4px 6px 0 rgb(83 83 92 / 11%);
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: 600;
+    padding: 1rem 2rem;
+    text-transform: uppercase;
 }

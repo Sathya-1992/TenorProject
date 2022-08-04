@@ -11,6 +11,9 @@ var nextClickCount = 1;
 var previousClickCount;
 var nextButton = document.querySelector(".nextButton");
 var prevButton = document.querySelector(".prevButton");
+var searchEle = document.getElementById("searchInput");
+var searchValue;
+var colors = ["rgb(166, 179, 139)","rgb(139, 152, 179)","rgb(152, 139, 179)","rgb(139, 179, 152)","rgb(139, 166, 179)","rgb(179, 179, 139)","rgb(179, 139, 179)","rgb(152, 139, 179)"]
 
 window.onload = async function(){
     let trendingGifs = await handleSearchTrendingGifs();
@@ -89,18 +92,45 @@ renderSearchItem = async function(){
 }
 
 function handleSearchSuggestion(){
-    let searchTerm = document.getElementById("searchInput").value;
-    let url = apiDomain+"/v2/search_suggestions?key="+apiKey+"&q="+searchTerm;
+    searchValue = searchEle.value;
+    let url = apiDomain+"/v2/search_suggestions?key="+apiKey+"&q="+searchValue;
     return fetch(url).then(function(res){
         return res.json();
     });
 }
   
 function renderSearchSuggestion(data){
+    let headerEle = document.querySelector(".headerTags");
+    headerEle.innerHTML="";
     let names = data.results || [];
     names.forEach((name) => {
-        console.log(name);
+        appendSearchRelatedInfo(headerEle,name);
     })
+}
+
+function appendSearchRelatedInfo(parentEle,value){
+    let headerValue = changeUpperCase();
+    document.getElementById("heading").textContent = headerValue;
+    let listEle = document.createElement("li");
+    let index = getRandomNumber(0,colors.length);
+    listEle.style.backgroundColor = colors[index];
+    listEle.classList.add("listAlign");
+    let listName = document.createTextNode(value);
+    listEle.appendChild(listName);
+    parentEle.appendChild(listEle);
+}
+
+function changeUpperCase(){
+    const words = searchValue.split(" ");
+    for (let i = 0; i < words.length; i++) {
+        words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+    }
+    return words.join(" ");
+}
+
+function getRandomNumber(min,max){
+    let index = Math.floor(Math.random() * (max - min) + min);
+    return index;
 }
 
 // const containerElement = document.getElementById('container');
