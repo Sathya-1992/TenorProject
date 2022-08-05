@@ -55,7 +55,12 @@
             </div>
             <div class="trending">
                 <h2>Featured GIFs</h2>
-                <div></div>
+                <div id="gifLayout">
+                    <div class="column"></div>
+                    <div class="column"></div>
+                    <div class="column"></div>
+                    <div class="column"></div>
+                </div>
             </div>
         </main>
         <main id="searchPage" class="marginAlign">
@@ -70,10 +75,10 @@
                         <div id="stickerData"></div>
                     </div>
                     <div class="buttons">
-                        <div class="prevSticker flex">
+                        <div class="prevSticker flex" onclick="movePreviousStickers()">
                             <img src="./Image/prevButton.png" alt="previous">
                         </div>
-                        <div class="nextSticker flex">
+                        <div class="nextSticker flex" onclick="moveNextStickers()">
                             <img src="./Image/nextButton.png" alt="next">
                         </div>
                     </div>
@@ -81,7 +86,12 @@
             </div>
             <div class="trending">
                 <h2 id="gifs"></h2>
-                <div></div>
+                <div id="gifLayout">
+                    <div class="searchColumn"></div>
+                    <div class="searchColumn"></div>
+                    <div class="searchColumn"></div>
+                    <div class="searchColumn"></div>
+                </div>
             </div>
         </main>
     </div>

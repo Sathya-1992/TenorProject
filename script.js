@@ -3,12 +3,18 @@ var apiDomain = "https://tenor.googleapis.com";
 var apiKey = "AIzaSyBKV66hMoCO9nD0lvEZOGDseK4Cw_pmGG4";
 var trendingEle;
 var stickerEle;
+var featuredGifEle;
+var parentColumnEle;
 var root = document.documentElement;
 var rootCS = getComputedStyle(root);
 var parentWidth;
+var stickerParentWidth;
 var leftValue;
+var stickerLeftValue;
 var tags;
+var stickerDetails
 var nextClickCount = 1;
+var stickerNextClickCount = 1;
 var previousClickCount;
 var nextButton = document.querySelector(".nextButton");
 var prevButton = document.querySelector(".prevButton");
@@ -16,6 +22,8 @@ var searchEle = document.getElementById("searchInput");
 var homePageEle = document.getElementById("homePage");
 var searchPageEle =document.getElementById("searchPage");
 var searchBtnEle = document.getElementById("searchBtn");
+var stickerPrevButton = document.querySelector(".prevSticker");
+var stickerNextButton = document.querySelector(".nextSticker");
 var searchValue;
 var colors = ["rgb(166, 179, 139)","rgb(139, 152, 179)","rgb(152, 139, 179)","rgb(139, 179, 152)","rgb(139, 166, 179)","rgb(179, 179, 139)","rgb(179, 139, 179)","rgb(152, 139, 179)"]
 var trendId = 1;
@@ -25,6 +33,7 @@ window.onload = async function(){
     let featuredGifs = await featuredGifsRequestHandler(0);
     let featuredGifNext = featuredGifs.next;
     renderTrendyGifs(trendingGifs);
+    renderFeaturedGifs(featuredGifs,"start");
 };
 
 /** Request Handlers */
@@ -46,15 +55,22 @@ function featuredGifsRequestHandler(nextPos){
 }
 
 function stickersRequestHandler(searchValue){
-    let limit = 20;
+    let limit = 50;
     let url = apiDomain+"/v2/search?key="+apiKey+"&q="+searchValue+"&searchfilter=sticker&media_filter=tinygif_transparent&limit="+limit;
     return fetch(url).then(function(res){
         return res.json();
     });
 }
 
+function handleSearchSuggestion(searchValue){
+    let url = apiDomain+"/v2/search_suggestions?key="+apiKey+"&q="+searchValue;
+    return fetch(url).then(function(res){
+        return res.json();
+    });
+}
+
 function gifSearchRequestHandler(searchValue){
-    let limit = 20;
+    let limit = 50;
     let url = apiDomain+"/v2/search?key="+apiKey+"&q="+searchValue+"&media_filter=tinygif&limit="+limit;
     return fetch(url).then(function(res){
         return res.json();
@@ -68,6 +84,38 @@ function renderTrendyGifs(data){
         let tagElement = constructTagElement(tagInfo.searchterm,tagInfo.image)
         trendingEle.appendChild(tagElement);
     })
+}
+
+function renderFeaturedGifs(data,process){
+    if(process==="start"){
+        featuredGifElements = document.getElementsByClassName("column");
+    }
+    else if(process==="search"){
+        featuredGifElements = document.getElementsByClassName("searchColumn");
+        for(let i=0;i<featuredGifElements.length;i++){
+            featuredGifElements[i].innerHTML="";
+        }
+    }
+    let featuredGifTags = data.results || [];
+    let index = 0;
+    let gifChildEle;
+    if(featuredGifTags){
+        document.getElementById("gifs").textContent="GIFs"
+        featuredGifTags.forEach((gifInfo) => {
+            if(process==="start"){
+                gifChildEle = constructFeaturedGifElement(gifInfo.media_formats.gif.url,gifInfo.tags);
+            }
+            else if(process==="search"){
+                gifChildEle = constructFeaturedGifElement(gifInfo.media_formats.tinygif.url,gifInfo.tags);
+            }
+            if(index>(featuredGifElements.length-1)){
+                index=0;
+            }
+            parentColumnEle = featuredGifElements[index];
+            parentColumnEle.appendChild(gifChildEle);
+            index++; 
+        })
+    }
 }
 
 function constructTagElement(imageName,imageUrl){
@@ -93,13 +141,28 @@ function constructTagElement(imageName,imageUrl){
     return divEle;
 }
 
-function getLeftValue(){
+function constructFeaturedGifElement(gifUrl,gifTags){
+    let divEle = document.createElement("div");
+    let imgEle = document.createElement("img");
+    let ulEle = document.createElement("ul");
+
+    divEle.classList.add("featureAlign");
+
+    imgEle.classList.add("featuredGif");
+    imgEle.setAttribute("src",gifUrl);
+
+    divEle.appendChild(imgEle);
+
+    return divEle;
+}
+
+function getTrendingWidthValue(){
     parentWidth = trendingEle.offsetWidth;
     leftValue = parseInt(rootCS.getPropertyValue("--trendingLeft"));
 }
 
 function moveNextTrendingGifs(){
-    getLeftValue();
+    getTrendingWidthValue();
     let newValue = leftValue - parentWidth;
     root.style.setProperty("--trendingLeft",newValue);
     nextClickCount++;
@@ -107,7 +170,7 @@ function moveNextTrendingGifs(){
 }
 
 function movePreviousTrendingGifs(){
-    getLeftValue();
+    getTrendingWidthValue();
     let newValue = leftValue + parentWidth;
     root.style.setProperty("--trendingLeft",newValue);
     nextClickCount--;
@@ -121,10 +184,10 @@ function handleTrendyGifsPaginationUI(){
     else if(nextClickCount==1){
         prevButton.style.display="none";
     }
-    if(nextClickCount===(tags.length/5)){
+    if(nextClickCount===Math.ceil((tags.length/5))){
         nextButton.style.display="none";
     }
-    else if(nextClickCount<(tags.length/5)){
+    else if(nextClickCount<Math.ceil((tags.length/5))){
         nextButton.style.display="block";
     }
 }
@@ -141,36 +204,35 @@ renderSearchItem = async function(){
     searchValue = searchEle.value;
     let searchSuggestion = await handleSearchSuggestion(searchValue);
     let stickers = await stickersRequestHandler(searchValue);
+    let searchGifs = await gifSearchRequestHandler(searchValue);
     renderSearchSuggestion(searchSuggestion);
     renderSearchStickers(stickers);
+    renderFeaturedGifs(searchGifs,"search");
+    
 }
 
-function handleSearchSuggestion(searchValue){
-    let url = apiDomain+"/v2/search_suggestions?key="+apiKey+"&q="+searchValue;
-    return fetch(url).then(function(res){
-        return res.json();
-    });
-}
-  
 function renderSearchSuggestion(data){
     let headerEle = document.querySelector(".headerTags");
     headerEle.innerHTML="";
     document.getElementById("heading").textContent = searchValue;
     let names = data.results || [];
     names.forEach((name) => {
-        appendSearchRelatedInfo(headerEle,name);
+        let searchSuggestionChild = constructSearchSuggestionElement(name);
+        headerEle.appendChild(searchSuggestionChild);
     })
 }
 
 
-function appendSearchRelatedInfo(parentEle,value){
+function constructSearchSuggestionElement(value){
     let listEle = document.createElement("li");
     let index = getRandomNumber(0,colors.length);
     listEle.style.backgroundColor = colors[index];
     listEle.classList.add("listAlign");
+    listEle.id = value;
+    listEle.setAttribute("onclick","showStickersForSelectedTopic(this.id)");
     let listName = document.createTextNode(value);
     listEle.appendChild(listName);
-    parentEle.appendChild(listEle);
+    return listEle;
 }
 
 function getRandomNumber(min,max){
@@ -178,29 +240,107 @@ function getRandomNumber(min,max){
     return index;
 }
 
+function showStickersForSelectedTopic(searchTopic){
+    searchEle.value= searchTopic;
+    searchBtnEle.click();
+}
+
 function renderSearchStickers(data){
     stickerEle = document.getElementById("stickerData");
-    let stickerDetails = data.results || [];
+    stickerEle.innerHTML="";
+    stickerDetails = data.results || [];
     if(stickerDetails){
         document.getElementById("stickerHeading").textContent="Stickers";
         stickerDetails.forEach((stickerInfo)=>{
-            let stickerUrl = stickerInfo.media_formats.tinygif_transparent.url;
-            let stickerChildEle = constructStickerElement(stickerUrl);
+            let stickerChildEle = constructStickerElement(stickerInfo.media_formats.tinygif_transparent.url,stickerInfo.tags);
             stickerEle.appendChild(stickerChildEle);
         })
     }
 }
 
-function constructStickerElement(imageUrl){
+function constructStickerElement(imageUrl,tagNames){
     let divEle = document.createElement("div");
     let imgEle = document.createElement("img");
 
     divEle.classList.add("stickerAlign")
     imgEle.setAttribute("src",imageUrl);
     imgEle.classList.add("stickerImg");
-
+    
     divEle.appendChild(imgEle);
+    if(tagNames){
+        let ulEle = document.createElement("ul");
+        ulEle.classList.add("tagsParent");
+        tagNames.forEach((tag) => {
+            let liEle = document.createElement("li");
+            liEle.classList.add("tagList");
+            liEle.id=tag;
+            liEle.setAttribute("onclick","showSelectedStickersAndGifs(this.id)");
+            let liText = document.createTextNode("#"+tag);
+            liEle.appendChild(liText);
+            ulEle.appendChild(liEle);
+        })
+        divEle.appendChild(ulEle);
+    }
+
     return divEle;
+}
+
+// function rendersearchGifs(data){
+//     stickerEle = document.getElementById("stickerData");
+//     stickerEle.innerHTML="";
+//     stickerDetails = data.results || [];
+//     if(stickerDetails){
+//         document.getElementById("stickerHeading").textContent="Stickers";
+//         stickerDetails.forEach((stickerInfo)=>{
+//             let stickerChildEle = constructStickerElement(stickerInfo.media_formats.tinygif_transparent.url,stickerInfo.tags);
+//             stickerEle.appendChild(stickerChildEle);
+//         })
+//     }
+// }
+
+function showSelectedStickersAndGifs(selectedTag){
+    searchEle.value= selectedTag;
+    searchBtnEle.click();
+}
+
+function getStickerWidthValue(){
+    stickerParentWidth = stickerEle.offsetWidth;
+    stickerLeftValue = parseInt(rootCS.getPropertyValue("--stickerLeft"));
+}
+
+function moveNextStickers(){
+    getStickerWidthValue();
+    let newValue = stickerLeftValue - stickerParentWidth;
+    root.style.setProperty("--stickerLeft",newValue);
+    stickerNextClickCount++;
+    handleStickersPaginationUI();
+}
+
+function movePreviousStickers(){
+    getStickerWidthValue();
+    let newValue = stickerLeftValue + stickerParentWidth;
+    root.style.setProperty("--stickerLeft",newValue);
+    stickerNextClickCount--;
+    handleStickersPaginationUI();
+}
+
+function handleStickersPaginationUI(){
+    if(stickerNextClickCount>1){
+        stickerPrevButton.style.pointerEvents="all";
+        stickerPrevButton.style.opacity ="1";
+    }
+    else if(stickerNextClickCount==1){
+        stickerPrevButton.style.pointerEvents="none";
+        stickerPrevButton.style.opacity ="0.3";
+    }
+    if(stickerNextClickCount===Math.ceil((stickerDetails.length/5))){
+        stickerNextButton.style.pointerEvents="none";
+        stickerNextButton.style.opacity ="0.3";
+    }
+    else if(stickerNextClickCount<Math.ceil((stickerDetails.length/5))){
+        stickerNextButton.style.pointerEvents="all";
+        stickerNextButton.style.opacity ="1";
+    }
 }
 
 // const containerElement = document.getElementById('container');
