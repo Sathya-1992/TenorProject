@@ -12,7 +12,7 @@ var stickerParentWidth;
 var leftValue;
 var stickerLeftValue;
 var tags;
-var stickerDetails
+var stickerDetails;
 var nextClickCount = 1;
 var stickerNextClickCount = 1;
 var previousClickCount;
@@ -36,6 +36,9 @@ var searchFeaturedGifNext;
 var renderSearchGif;
 var featuredGifElements;
 
+/**
+ * To render all trending tenor anf Gifs.
+ */
 window.onload = async function(){
     let trendingGifs = await handleSearchTrendingGifs();
     let featuredGifs = await featuredGifsRequestHandler(0);
@@ -68,13 +71,21 @@ window.onload = async function(){
 };
 
 /** Request Handlers */
+/**
+ * Fetch trending Gifs
+ * @returns data of trending request.
+ */
 function handleSearchTrendingGifs(){
     let url = apiDomain+"/v2/categories?key="+apiKey+"&type=trending";
     return fetch(url).then(function(res){
         return res.json();
     });
 }
-
+/**
+ * 
+ * @param {*} nextPos to give value to pos parameter
+ * @returns data of trending Gifs.
+ */
 function featuredGifsRequestHandler(nextPos){
     let limit = 20;
     let url = apiDomain+"/v2/featured?key="+apiKey+"&media_filter=gif&limit="+limit;
@@ -85,7 +96,11 @@ function featuredGifsRequestHandler(nextPos){
         return res.json();
     });
 }
-
+/**
+ * 
+ * @param {*} searchValue to give value to q parameter.
+ * @returns data of searcherd sticker.
+ */
 function stickersRequestHandler(searchValue){
     let limit = 50;
     let url = apiDomain+"/v2/search?key="+apiKey+"&q="+searchValue+"&searchfilter=sticker&media_filter=tinygif_transparent&limit="+limit;
@@ -93,14 +108,23 @@ function stickersRequestHandler(searchValue){
         return res.json();
     });
 }
-
+/**
+ * 
+ * @param {*} searchValue to give value to q parameter. 
+ * @returns data of search suggestion topic.
+ */
 function handleSearchSuggestion(searchValue){
     let url = apiDomain+"/v2/search_suggestions?key="+apiKey+"&q="+searchValue;
     return fetch(url).then(function(res){
         return res.json();
     });
 }
-
+/**
+ * 
+ * @param {*} searchValue searchValue to give value to q parameter. 
+ * @param {*} nextPos to give value to pos parameter
+ * @returns data of search related Gif.
+ */
 function gifSearchRequestHandler(searchValue,nextPos){
     let limit = 20;
     let url = apiDomain+"/v2/search?key="+apiKey+"&q="+searchValue+"&media_filter=tinygif&limit="+limit;
@@ -111,7 +135,10 @@ function gifSearchRequestHandler(searchValue,nextPos){
         return res.json();
     });
 }
-
+/**
+ * 
+ * @param {*} data to render trending Gifs
+ */
 function renderTrendyGifs(data){
     trendingEle = document.getElementById("parentTenor");
     tags = data.tags || [];
@@ -120,7 +147,11 @@ function renderTrendyGifs(data){
         trendingEle.appendChild(tagElement);
     })
 }
-
+/**
+ * 
+ * @param {*} data to render featured and searched Gifs
+ * @param {*} process to identify featured Gif or searched Gif for rendering Process.
+ */
 function renderFeaturedGifs(data,process){
     if(process==="start"){
         featuredGifElements = document.getElementsByClassName("column");
@@ -149,7 +180,12 @@ function renderFeaturedGifs(data,process){
         })
     }
 }
-
+/**
+ * 
+ * @param {*} imageName to constuct element with its name
+ * @param {*} imageUrl to show image Gif
+ * @returns element to append.
+ */
 function constructTagElement(imageName,imageUrl){
     let divEle = document.createElement("div");
     let imageEle = document.createElement("img");
@@ -172,7 +208,12 @@ function constructTagElement(imageName,imageUrl){
     trendId++;
     return divEle;
 }
-
+/**
+ * 
+ * @param {*} gifUrl to show Gif image.
+ * @param {*} gifTags to show the text related with image
+ * @returns element to append with related topic.
+ */
 function constructFeaturedGifElement(gifUrl,gifTags){
     let divEle = document.createElement("div");
     let imgEle = document.createElement("img");
@@ -189,24 +230,32 @@ function constructFeaturedGifElement(gifUrl,gifTags){
     }
     return divEle;
 }
-
+/**
+ * To get next value from Json Data and render the data.
+ */
 fetchNextFeaturedRequest = async function(){
     let nextFeaturedGifs = await featuredGifsRequestHandler(featuredGifNext);
     featuredGifNext = nextFeaturedGifs.next;
     renderFeaturedGifs(nextFeaturedGifs,"start");
 }
-
+/**
+ * To get next value from searched Json data and render the next data.
+ */
 fetchNextSearchFeatureRequest = async function(){
     let nextSearchFeaturedGifs = await gifSearchRequestHandler(searchValue,searchFeaturedGifNext);
     searchFeaturedGifNext = nextSearchFeaturedGifs.next;
     renderFeaturedGifs(nextSearchFeaturedGifs,"search"); 
 }
-
+/**
+ * To get width of trending Gif for carousel.
+ */
 function getTrendingWidthValue(){
     parentWidth = trendingEle.offsetWidth;
     leftValue = parseInt(rootCS.getPropertyValue("--trendingLeft"));
 }
-
+/**
+ * To move next data of trending Gif.
+ */
 function moveNextTrendingGifs(){
     getTrendingWidthValue();
     let newValue = leftValue - parentWidth;
@@ -214,7 +263,9 @@ function moveNextTrendingGifs(){
     nextClickCount++;
     handleTrendyGifsPaginationUI();
 }
-
+/**
+ * To move Previous data of trending Gif.
+ */
 function movePreviousTrendingGifs(){
     getTrendingWidthValue();
     let newValue = leftValue + parentWidth;
@@ -222,7 +273,9 @@ function movePreviousTrendingGifs(){
     nextClickCount--;
     handleTrendyGifsPaginationUI();
 }
-
+/**
+ * To handle next and previous button UI.
+ */
 function handleTrendyGifsPaginationUI(){
     if(nextClickCount>1){
         prevButton.style.display="block";
@@ -237,13 +290,18 @@ function handleTrendyGifsPaginationUI(){
         nextButton.style.display="block";
     }
 }
-
+/**
+ * 
+ * @param {*} elementId to get the input of searched value.
+ */
 function showSelectedTopic(elementId){
     let searchName = document.getElementById(elementId).lastChild.textContent;
     searchEle.value= searchName;
     searchBtnEle.click();
 }
-
+/**
+ * To render the Search related Stickers and Gifs.
+ */
 renderSearchItem = async function(){
     if(featuredGifElements){
         for(let i=0;i<featuredGifElements.length;i++){
@@ -262,7 +320,10 @@ renderSearchItem = async function(){
     renderSearchStickers(stickers);
     renderFeaturedGifs(searchGifs,"search");  
 }
-
+/**
+ * 
+ * @param {*} data to render the sticker suggestion topic.
+ */
 function renderSearchSuggestion(data){
     let headerEle = document.querySelector(".headerTags");
     headerEle.innerHTML="";
@@ -273,8 +334,11 @@ function renderSearchSuggestion(data){
         headerEle.appendChild(searchSuggestionChild);
     })
 }
-
-
+/**
+ * 
+ * @param {*} value to show the search related topic.
+ * @returns element to append with search suggestion topic.
+ */
 function constructSearchSuggestionElement(value){
     let listEle = document.createElement("li");
     let index = getRandomNumber(0,colors.length);
@@ -286,17 +350,28 @@ function constructSearchSuggestionElement(value){
     listEle.appendChild(listName);
     return listEle;
 }
-
+/**
+ * 
+ * @param {*} min to get random number greater than min value.
+ * @param {*} max to get random number within max value
+ * @returns random value to get random color.
+ */
 function getRandomNumber(min,max){
     let index = Math.floor(Math.random() * (max - min) + min);
     return index;
 }
-
+/**
+ * 
+ * @param {*} searchTopic to search based on this topic
+ */
 function showStickersForSelectedTopic(searchTopic){
     searchEle.value= searchTopic;
     searchBtnEle.click();
 }
-
+/**
+ * 
+ * @param {*} data to render search related stickers.
+ */
 function renderSearchStickers(data){
     stickerEle = document.getElementById("stickerData");
     stickerEle.innerHTML="";
@@ -319,7 +394,12 @@ function renderSearchStickers(data){
         showStickers.style.display = "none";
     }
 }
-
+/**
+ * 
+ * @param {*} imageUrl to show the stickers
+ * @param {*} tagNames to show related topic of Sticker.
+ * @returns element to append Stickers.
+ */
 function constructStickerElement(imageUrl,tagNames){
     let divEle = document.createElement("div");
     let imgEle = document.createElement("img");
@@ -336,7 +416,11 @@ function constructStickerElement(imageUrl,tagNames){
 
     return divEle;
 }
-
+/**
+ * 
+ * @param {*} tagNames to show hash tags of related Gifs
+ * @returns element to append with Image
+ */
 function constructHashTags(tagNames){
     let ulEle = document.createElement("ul");
         ulEle.classList.add("tagsParent");
@@ -351,17 +435,24 @@ function constructHashTags(tagNames){
         })
         return ulEle;
 }
-
+/**
+ * 
+ * @param {*} selectedTag to search related Sticker ang Gifs
+ */
 function showSelectedStickersAndGifs(selectedTag){
     searchEle.value= selectedTag;
     searchBtnEle.click();
 }
-
+/**
+ * To get Sticker element width value for carousel.
+ */
 function getStickerWidthValue(){
     stickerParentWidth = stickerEle.offsetWidth;
     stickerLeftValue = parseInt(rootCS.getPropertyValue("--stickerLeft"));
 }
-
+/**
+ * To move next data of searched Stickers.
+ */
 function moveNextStickers(){
     getStickerWidthValue();
     let newValue = stickerLeftValue - stickerParentWidth;
@@ -369,7 +460,9 @@ function moveNextStickers(){
     stickerNextClickCount++;
     handleStickersPaginationUI();
 }
-
+/**
+ * To move previous data of searched stickers.
+ */
 function movePreviousStickers(){
     getStickerWidthValue();
     let newValue = stickerLeftValue + stickerParentWidth;
@@ -377,7 +470,9 @@ function movePreviousStickers(){
     stickerNextClickCount--;
     handleStickersPaginationUI();
 }
-
+/**
+ * To handle next and previous button of Stickers.
+ */
 function handleStickersPaginationUI(){
     if(stickerNextClickCount>1){
         stickerPrevButton.style.pointerEvents="all";
@@ -402,4 +497,4 @@ searchEle.addEventListener("keypress",function(event){
       event.preventDefault();
       searchBtnEle.click();
     }
-  });
+});
