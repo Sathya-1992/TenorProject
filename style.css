@@ -258,7 +258,7 @@ ul{
 .buttons{
     border-radius: 5px;
     box-shadow: 0 4px 10px 0 rgb(0 0 0 / 5%), 0 2px 4px 0 rgb(0 0 0 / 8%);
-    display: flex;
+    display: none;
     flex-direction: column;
     height: 18.2rem;
     width: 10rem;
@@ -298,7 +298,7 @@ ul{
     padding: 0rem 1rem 1rem 0rem;
     width: 90%;
 }
-.stickerAlign:hover .tagsParent{
+.stickerAlign:hover .tagsParent,.featureAlign:hover .tagsParent{
     display: flex;
 }
 .tagList{
@@ -324,9 +324,14 @@ ul{
     width:100%;
     border-radius: 5px;
 }
+.featureAlign .tagsParent{
+    padding-left: 1rem;
+    padding-bottom: 1.8rem;
+}
 .featureAlign{ 
     box-shadow: 0 4px 10px 0 rgb(0 0 0 / 5%), 0 2px 4px 0 rgb(0 0 0 / 8%);
     cursor: pointer;
+    position: relative;
 }
 .featuredGif{
     object-fit: cover;
@@ -335,4 +340,20 @@ ul{
 .featureAlign:hover{
     transform: scale(1.01);
     transition: transform .25s ease-out
+}
+#showStickers{
+    display: none;
+}
+.favButton{
+    /* display: none; */
+    left: 5px;
+    position: absolute;
+    top: 5px;
+    height: 30px;
+    width: 30px;
+    background-color: #171717;
+    border-radius: 50%;
+    box-shadow: 0 4px 6px 0 rgb(83 83 92 / 11%), 0 1px 3px 0 rgb(0 0 0 / 8%);
+    color: #d0d0d0;
+    cursor: pointer;
 }

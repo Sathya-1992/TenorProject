@@ -31,7 +31,7 @@
         </nav>
         <header>
             <div class="marginAlign searchPosition">
-                <img src="./Image/tenor-logo-white.svg" alt="tenorWhite">
+                <img src="./Image/tenor-logo-white.svg" alt="tenorWhite" onclick="location.reload()">
                 <div class="searchBar flex">
                     <input placeholder="Search for GIFs and Stickers" id="searchInput">
                     <img src="./Image/search.png" alt="search" id="searchBtn" onclick="renderSearchItem()">
@@ -68,7 +68,7 @@
                 <h1 id="heading"></h1>
                 <ul class="headerTags"></ul>
             </div>
-            <div class="trending">
+            <div class="trending" id="showStickers">
                 <h2 id="stickerHeading"></h2>
                 <div class="stickerContainer">
                     <div class="stickerParent">
