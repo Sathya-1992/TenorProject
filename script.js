@@ -329,8 +329,6 @@ function constructStickerElement(imageUrl,tagNames){
     imgEle.classList.add("stickerImg");
     
     divEle.appendChild(imgEle);
-    // let favElement = constructFavouriteButton();
-    // divEle.appendChild(favElement);
     if(tagNames){
         let ulElement = constructHashTags(tagNames);
         divEle.appendChild(ulElement);
@@ -353,18 +351,6 @@ function constructHashTags(tagNames){
         })
         return ulEle;
 }
-
-// function constructFavouriteButton(){
-//     let divEle = document.createElement("div");
-//     let imgEle = document.createElement("img");
-
-//     divEle.classList.add("favButton");
-//     imgEle.setAttribute("src","./Image/favourite.png");
-//     imgEle.classList.add("favImageIcon");
-
-//     divEle.appendChild(imgEle);
-//     return divEle;
-// }
 
 function showSelectedStickersAndGifs(selectedTag){
     searchEle.value= selectedTag;
