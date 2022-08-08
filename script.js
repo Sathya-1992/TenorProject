@@ -56,7 +56,6 @@ window.onload = async function(){
             root.style.setProperty("--inputPosition","0");
         }
         if((containerScrollTop+containerElement.clientHeight) >= containerElement.scrollHeight){
-            console.log(featuredGifNext);
             if(renderSearchGif){
                 fetchNextSearchFeatureRequest();
             }
