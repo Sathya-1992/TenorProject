@@ -35,6 +35,7 @@ var featuredGifNext;
 var searchFeaturedGifNext;
 var renderSearchGif;
 var featuredGifElements;
+var nextFeatGif;
 
 /**
  * To render all trending tenor anf Gifs.
@@ -59,13 +60,11 @@ window.onload = async function(){
             if(renderSearchGif){
                 fetchNextSearchFeatureRequest();
             }
-            else{
+            else if(nextFeatGif){
                 fetchNextFeaturedRequest();
             }     
         }
-        else{
-            
-        }
+        
     });
 };
 
@@ -154,9 +153,11 @@ function renderTrendyGifs(data){
 function renderFeaturedGifs(data,process){
     if(process==="start"){
         featuredGifElements = document.getElementsByClassName("column");
+        nextFeatGif = true;
     }
     else if(process==="search"){
         featuredGifElements = document.getElementsByClassName("searchColumn");
+        renderSearchGif = true;
     }
     let featuredGifTags = data.results || [];
     let index = 0;
@@ -302,6 +303,7 @@ function showSelectedTopic(elementId){
  * To render the Search related Stickers and Gifs.
  */
 renderSearchItem = async function(){
+    nextFeatGif = false;
     if(featuredGifElements){
         for(let i=0;i<featuredGifElements.length;i++){
             featuredGifElements[i].innerHTML="";
@@ -310,7 +312,7 @@ renderSearchItem = async function(){
     homePageEle.style.display = "none";
     searchPageEle.style.display = "grid";
     searchValue = searchEle.value;
-    renderSearchGif = true;
+    renderSearchGif = false;
     let searchSuggestion = await handleSearchSuggestion(searchValue);
     let stickers = await stickersRequestHandler(searchValue);
     let searchGifs = await gifSearchRequestHandler(searchValue,0);
