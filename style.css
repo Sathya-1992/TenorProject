@@ -43,7 +43,6 @@ nav{
 img[alt="Tenor"], img[alt="tenorWhite"]{
     width: 8rem;
     height: 2.2rem;
-    cursor: pointer;
 }
 .flex{
     display: flex;
@@ -53,7 +52,7 @@ img[alt="Tenor"], img[alt="tenorWhite"]{
 .navBar{
     gap: 2rem;
 }
-img[alt="upload"]{
+img[alt="upload"], img[alt="search"]{
     width: 2rem;
     height: 2rem;
 }
@@ -124,9 +123,6 @@ input{
 img[alt="search"]{
     position: absolute;
     right:1.5rem;
-    width: 2rem;
-    height: 2rem;
-    cursor: pointer;
 }
 #homePage,.trending, #searchPage{
     display: grid;
@@ -169,7 +165,6 @@ img[alt="search"]{
     margin: 0 1rem;
     position: relative;
     width: calc(20% - 2rem);
-    cursor: pointer;
 }
 .trendingGif{
     border-radius: 0.5rem;
@@ -194,7 +189,6 @@ img[alt="search"]{
     position: absolute;
     top: 4.8rem;
     opacity: 0.3;
-    cursor: pointer;
 }
 .prevButton{
     left: -2.5rem;
@@ -229,7 +223,6 @@ ul{
     font-weight: 600;
     padding: 1rem 2rem;
     text-transform: uppercase;
-    cursor: pointer;
 }
 .listAlign:hover{
     box-shadow: 0 7px 14px rgb(50 50 93 / 10%), 0 3px 6px rgb(0 0 0 / 8%);
@@ -254,7 +247,6 @@ ul{
     height: 18.2rem;
     border-radius: 5px;
     box-shadow: 0 4px 10px 0 rgb(0 0 0 / 5%), 0 2px 4px 0 rgb(0 0 0 / 8%);
-    cursor: pointer;
     padding: 1rem;
 }
 .buttons{
@@ -332,7 +324,7 @@ ul{
 }
 .featureAlign{ 
     box-shadow: 0 4px 10px 0 rgb(0 0 0 / 5%), 0 2px 4px 0 rgb(0 0 0 / 8%);
-    cursor: pointer;
+    
     position: relative;
 }
 .featuredGif{
@@ -345,4 +337,7 @@ ul{
 }
 #showStickers{
     display: none;
+}
+.featureAlign, img[alt="Tenor"], img[alt="tenorWhite"], img[alt="search"], .imageAlign,.stickerAlign, .prevButton, .nextButton, .listAlign,.stickerAlign,.buttons{
+    cursor: pointer;
 }
