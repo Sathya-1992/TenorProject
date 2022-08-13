@@ -12,9 +12,9 @@ body{
     overflow: hidden;
 }
 :root{
-    --trendingLeft :0;
+    --trendingLeft :0%;
     --headerNameColor :rgb(166, 179, 139);
-    --stickerLeft :0;
+    --stickerLeft :0%;
     --inputPosition :0;
 }
 .container{
@@ -153,11 +153,11 @@ img[alt="search"]{
     margin: 0 -1rem;
 }
 #parentTenor{
-    left: calc(var(--trendingLeft)*(1px));
+    transform : translateX(var(--trendingLeft))
 }
 #parentTenor,#stickerData{
     position: absolute;
-    transition: left .3s linear;
+    transition: transform .3s linear;
     width: 100%;
 }
 .imageAlign,.stickerAlign{
@@ -241,7 +241,7 @@ ul{
     width: 100%;
 }
 #stickerData{
-    left: calc(var(--stickerLeft)*(1px));
+    transform: translateX(var(--stickerLeft));
 }
 .stickerAlign{
     height: 18.2rem;

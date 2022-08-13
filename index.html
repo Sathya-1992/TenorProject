@@ -34,7 +34,7 @@
                 <img src="./Image/tenor-logo-white.svg" alt="tenorWhite" onclick="location.reload()">
                 <div class="searchBar flex">
                     <input placeholder="Search for GIFs and Stickers" id="searchInput">
-                    <img src="./Image/search.png" alt="search" id="searchBtn" onclick="renderSearchItem()">
+                    <img src="./Image/search.png" alt="search" id="searchBtn">
                 </div>
             </div>
         </header>
@@ -45,10 +45,10 @@
                     <div id="tenor">
                         <div id="parentTenor"></div>
                     </div>
-                    <div class="prevButton flex" onclick="movePreviousTrendingGifs()">
+                    <div class="prevButton flex" id="prevGif">
                         <img src="./Image/prevButton.png" alt="previous">
                     </div>
-                    <div class="nextButton flex" onclick="moveNextTrendingGifs()">
+                    <div class="nextButton flex" id="nextGif">
                         <img src="./Image/nextButton.png" alt="next">
                     </div>
                 </div>
@@ -75,10 +75,10 @@
                         <div id="stickerData"></div>
                     </div>
                     <div class="buttons">
-                        <div class="prevSticker flex" onclick="movePreviousStickers()">
+                        <div class="prevSticker flex" id="prevSticker">
                             <img src="./Image/prevButton.png" alt="previous">
                         </div>
-                        <div class="nextSticker flex" onclick="moveNextStickers()">
+                        <div class="nextSticker flex" id="nextSticker">
                             <img src="./Image/nextButton.png" alt="next">
                         </div>
                     </div>
@@ -96,5 +96,6 @@
         </main>
     </div>
     <script type="text/javascript" src="./script.js"></script>
+    <!-- <script type="module" src="./utils.js"></script> -->
 </body>
 </html>

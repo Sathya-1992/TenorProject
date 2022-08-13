@@ -1,68 +1,71 @@
-
 var apiDomain = "https://tenor.googleapis.com";
 var apiKey = "AIzaSyBKV66hMoCO9nD0lvEZOGDseK4Cw_pmGG4";
-var trendingEle;
-var stickerEle;
-var featuredGifEle;
-var parentColumnEle;
 var root = document.documentElement;
 var rootCS = getComputedStyle(root);
-var parentWidth;
-var stickerParentWidth;
-var leftValue;
-var stickerLeftValue;
 var tags;
 var stickerDetails;
 var nextClickCount = 1;
 var stickerNextClickCount = 1;
-var previousClickCount;
-var nextButton = document.querySelector(".nextButton");
-var prevButton = document.querySelector(".prevButton");
+var trendingEle = document.getElementById("parentTenor");
 var searchEle = document.getElementById("searchInput");
-var homePageEle = document.getElementById("homePage");
-var searchPageEle =document.getElementById("searchPage");
 var searchBtnEle = document.getElementById("searchBtn");
-var stickerPrevButton = document.querySelector(".prevSticker");
-var stickerNextButton = document.querySelector(".nextSticker");
-var showStickers = document.getElementById("showStickers");
-var stickerMoveButton = document.querySelector(".buttons");
 var containerElement = document.getElementById('container');
-var navElement = document.getElementsByTagName("nav")[0];
 var searchValue;
-var colors = ["rgb(166, 179, 139)","rgb(139, 152, 179)","rgb(152, 139, 179)","rgb(139, 179, 152)","rgb(139, 166, 179)","rgb(179, 179, 139)","rgb(179, 139, 179)","rgb(152, 139, 179)"]
-var trendId = 1;
 var featuredGifNext;
 var searchFeaturedGifNext;
 var renderSearchGif;
 var featuredGifElements;
 var nextFeatGif;
+var startValue;
+var featuredGifTags;
+var isFetchNextGif=false;
+var gifParentIndex = 0;
+var timeout;
 
 /**
  * To render all trending tenor anf Gifs.
  */
-window.onload = async function(){
-    let trendingGifs = await handleSearchTrendingGifs();
-    let featuredGifs = await featuredGifsRequestHandler(0);
-    featuredGifNext = featuredGifs.next;
-    renderTrendyGifs(trendingGifs);
-    renderFeaturedGifs(featuredGifs,"start");
+window.onload = function(){
+
+    let trendingGif = handleSearchTrendingGifs();
+    let featuredGif = featuredGifsRequestHandler(0);
+    Promise.all([trendingGif,featuredGif]).then((data) =>{
+        renderTrendyGifs(data[0]);
+        featuredGifNext = data[1].next;
+        renderFeaturedGifs(data[1],"start");
+    });
 
     containerElement.addEventListener("scroll", function(event){
         let containerScrollTop = event.target.scrollTop;
-        let navElementHeight = navElement.offsetHeight;
+        let navElementHeight = document.getElementsByTagName("nav")[0].offsetHeight;
+        let scrollValue = containerElement.scrollHeight-containerElement.clientHeight-300;
         if(containerScrollTop > navElementHeight){
             root.style.setProperty("--inputPosition","9rem");
         } 
         else{
             root.style.setProperty("--inputPosition","0");
         }
-        if((containerScrollTop+containerElement.clientHeight) >= containerElement.scrollHeight){
+
+        if(containerScrollTop >= scrollValue && !isFetchNextGif){
+            isFetchNextGif = true;
             if(renderSearchGif){
-                fetchNextSearchFeatureRequest();
+                if(startValue === 0){
+                    startValue = 25;
+                    addFeaturedGifToParent("search");
+                }
+                else{
+                    fetchNextSearchFeatureRequest();
+                }
             }
             else if(nextFeatGif){
-                fetchNextFeaturedRequest();
-            }     
+                if(startValue === 0){
+                    startValue = 25;
+                    addFeaturedGifToParent("start");
+                }
+                else{
+                    fetchNextFeaturedRequest();
+                }  
+            } 
         }
         
     });
@@ -85,7 +88,7 @@ function handleSearchTrendingGifs(){
  * @returns data of trending Gifs.
  */
 function featuredGifsRequestHandler(nextPos){
-    let limit = 20;
+    let limit = 50;
     let url = apiDomain+"/v2/featured?key="+apiKey+"&media_filter=gif&limit="+limit;
     if(nextPos){
         url = url + "&pos="+nextPos;
@@ -124,7 +127,7 @@ function handleSearchSuggestion(searchValue){
  * @returns data of search related Gif.
  */
 function gifSearchRequestHandler(searchValue,nextPos){
-    let limit = 20;
+    let limit = 50;
     let url = apiDomain+"/v2/search?key="+apiKey+"&q="+searchValue+"&media_filter=tinygif&limit="+limit;
     if(nextPos){
         url = url + "&pos="+nextPos;
@@ -138,12 +141,14 @@ function gifSearchRequestHandler(searchValue,nextPos){
  * @param {*} data to render trending Gifs
  */
 function renderTrendyGifs(data){
-    trendingEle = document.getElementById("parentTenor");
+    let tagElement="";
+    let trendId = 1;
     tags = data.tags || [];
     tags.forEach((tagInfo)=>{
-        let tagElement = constructTagElement(tagInfo.searchterm,tagInfo.image)
-        trendingEle.appendChild(tagElement);
-    })
+        tagElement += constructTagElement(tagInfo.searchterm,tagInfo.image,trendId);
+        trendId++;
+    });
+    trendingEle.insertAdjacentHTML("beforeend",tagElement);
 }
 /**
  * 
@@ -159,26 +164,31 @@ function renderFeaturedGifs(data,process){
         featuredGifElements = document.getElementsByClassName("searchColumn");
         renderSearchGif = true;
     }
-    let featuredGifTags = data.results || [];
-    let index = 0;
-    let gifChildEle;
+    featuredGifTags = data.results || [];
     if(featuredGifTags){
-        document.getElementById("gifs").textContent="GIFs"
-        featuredGifTags.forEach((gifInfo) => {
-            if(process==="start"){
-                gifChildEle = constructFeaturedGifElement(gifInfo.media_formats.gif.url,gifInfo.tags);
-            }
-            else if(process==="search"){
-                gifChildEle = constructFeaturedGifElement(gifInfo.media_formats.tinygif.url,gifInfo.tags);
-            }
-            if(index>(featuredGifElements.length-1)){
-                index=0;
-            }
-            parentColumnEle = featuredGifElements[index];
-            parentColumnEle.appendChild(gifChildEle);
-            index++; 
-        })
+        startValue = 0;
+        addFeaturedGifToParent(process);
     }
+}
+
+function addFeaturedGifToParent(process){
+    let gifChildEle = "";
+    document.getElementById("gifs").textContent="GIFs";
+    featuredGifTags.slice(startValue,startValue+25).forEach((gifInfo) => {
+        if(process==="start"){
+            gifChildEle = constructFeaturedGifElement(gifInfo.media_formats.gif.url,gifInfo.tags);
+        }
+        else if(process==="search"){
+            gifChildEle = constructFeaturedGifElement(gifInfo.media_formats.tinygif.url,gifInfo.tags);
+        }
+        if(gifParentIndex>(featuredGifElements.length-1)){
+            gifParentIndex=0;
+        }
+        var parentColumnEle = featuredGifElements[gifParentIndex];
+        parentColumnEle.insertAdjacentHTML("beforeend",gifChildEle);
+        gifParentIndex++; 
+    });
+    isFetchNextGif = false;
 }
 /**
  * 
@@ -186,26 +196,8 @@ function renderFeaturedGifs(data,process){
  * @param {*} imageUrl to show image Gif
  * @returns element to append.
  */
-function constructTagElement(imageName,imageUrl){
-    let divEle = document.createElement("div");
-    let imageEle = document.createElement("img");
-    let nameEle = document.createElement("div");
-
-    divEle.classList.add("imageAlign");
-    divEle.id = "trend"+trendId;
-    divEle.setAttribute("onclick","showSelectedTopic(this.id)");
-    
-    imageEle.setAttribute("src",imageUrl);
-    imageEle.classList.add("trendingGif");
-    nameEle.classList.add("imgNameAlign");
-    
-    let name = document.createTextNode(imageName);
-    nameEle.appendChild(name);
-    
-    divEle.appendChild(imageEle);
-    divEle.appendChild(nameEle);
-    
-    trendId++;
+function constructTagElement(imageName,imageUrl,trendId){
+    let divEle = "<div class='imageAlign' id='trend"+trendId+"' onclick=showSelectedTopic(this.id)><img src='"+imageUrl+"' class='trendingGif'><div class='imgNameAlign'>"+imageName+"</div></div>";
     return divEle;
 }
 /**
@@ -215,19 +207,12 @@ function constructTagElement(imageName,imageUrl){
  * @returns element to append with related topic.
  */
 function constructFeaturedGifElement(gifUrl,gifTags){
-    let divEle = document.createElement("div");
-    let imgEle = document.createElement("img");
-
-    divEle.classList.add("featureAlign");
-    imgEle.classList.add("featuredGif");
-    imgEle.setAttribute("src",gifUrl);
-
-    divEle.appendChild(imgEle);
-
+    let ulElement = "";
     if(gifTags){
-        let ulElement = constructHashTags(gifTags);
-        divEle.appendChild(ulElement);
+        ulElement = constructHashTags(gifTags);
     }
+
+    let divEle = "<div class='featureAlign'><img src='"+gifUrl+"' class='featuredGif'>"+ulElement+"</div>";
     return divEle;
 }
 /**
@@ -237,6 +222,7 @@ fetchNextFeaturedRequest = async function(){
     let nextFeaturedGifs = await featuredGifsRequestHandler(featuredGifNext);
     featuredGifNext = nextFeaturedGifs.next;
     renderFeaturedGifs(nextFeaturedGifs,"start");
+    isFetchNextGif = false;
 }
 /**
  * To get next value from searched Json data and render the next data.
@@ -245,38 +231,15 @@ fetchNextSearchFeatureRequest = async function(){
     let nextSearchFeaturedGifs = await gifSearchRequestHandler(searchValue,searchFeaturedGifNext);
     searchFeaturedGifNext = nextSearchFeaturedGifs.next;
     renderFeaturedGifs(nextSearchFeaturedGifs,"search"); 
+    isFetchNextGif = false;
 }
-/**
- * To get width of trending Gif for carousel.
- */
-function getTrendingWidthValue(){
-    parentWidth = trendingEle.offsetWidth;
-    leftValue = parseInt(rootCS.getPropertyValue("--trendingLeft"));
-}
-/**
- * To move next data of trending Gif.
- */
-function moveNextTrendingGifs(){
-    getTrendingWidthValue();
-    let newValue = leftValue - parentWidth;
-    root.style.setProperty("--trendingLeft",newValue);
-    nextClickCount++;
-    handleTrendyGifsPaginationUI();
-}
-/**
- * To move Previous data of trending Gif.
- */
-function movePreviousTrendingGifs(){
-    getTrendingWidthValue();
-    let newValue = leftValue + parentWidth;
-    root.style.setProperty("--trendingLeft",newValue);
-    nextClickCount--;
-    handleTrendyGifsPaginationUI();
-}
+
 /**
  * To handle next and previous button UI.
  */
 function handleTrendyGifsPaginationUI(){
+    var nextButton = document.getElementById("nextGif");
+    var prevButton = document.getElementById("prevGif");
     if(nextClickCount>1){
         prevButton.style.display="block";
     }
@@ -302,24 +265,28 @@ function showSelectedTopic(elementId){
 /**
  * To render the Search related Stickers and Gifs.
  */
-renderSearchItem = async function(){
+renderSearchItem = function(){
     nextFeatGif = false;
     if(featuredGifElements){
         for(let i=0;i<featuredGifElements.length;i++){
             featuredGifElements[i].innerHTML="";
         }
     }  
-    homePageEle.style.display = "none";
-    searchPageEle.style.display = "grid";
+    document.getElementById("homePage").style.display = "none";
+    document.getElementById("searchPage").style.display = "grid";
     searchValue = searchEle.value;
     renderSearchGif = false;
-    let searchSuggestion = await handleSearchSuggestion(searchValue);
-    let stickers = await stickersRequestHandler(searchValue);
-    let searchGifs = await gifSearchRequestHandler(searchValue,0);
-    searchFeaturedGifNext = searchGifs.next;
-    renderSearchSuggestion(searchSuggestion);
-    renderSearchStickers(stickers);
-    renderFeaturedGifs(searchGifs,"search");  
+
+    let searchSuggestion = handleSearchSuggestion(searchValue);
+    let stickers = stickersRequestHandler(searchValue);
+    let searchGifs = gifSearchRequestHandler(searchValue,0);
+
+    Promise.all([searchSuggestion,stickers,searchGifs]).then((data) =>{
+        renderSearchSuggestion(data[0]);
+        renderSearchStickers(data[1]);
+        searchFeaturedGifNext = data[2].next;
+        renderFeaturedGifs(data[2],"search");
+    });  
 }
 /**
  * 
@@ -327,13 +294,14 @@ renderSearchItem = async function(){
  */
 function renderSearchSuggestion(data){
     let headerEle = document.querySelector(".headerTags");
+    let searchSuggestionChild = "";
     headerEle.innerHTML="";
     document.getElementById("heading").textContent = searchValue;
     let names = data.results || [];
     names.forEach((name) => {
-        let searchSuggestionChild = constructSearchSuggestionElement(name);
-        headerEle.appendChild(searchSuggestionChild);
-    })
+        searchSuggestionChild += constructSearchSuggestionElement(name);
+    });
+    headerEle.insertAdjacentHTML("beforeend",searchSuggestionChild);
 }
 /**
  * 
@@ -341,14 +309,9 @@ function renderSearchSuggestion(data){
  * @returns element to append with search suggestion topic.
  */
 function constructSearchSuggestionElement(value){
-    let listEle = document.createElement("li");
+    let colors = ["rgb(166, 179, 139)","rgb(139, 152, 179)","rgb(152, 139, 179)","rgb(139, 179, 152)","rgb(139, 166, 179)","rgb(179, 179, 139)","rgb(179, 139, 179)","rgb(152, 139, 179)"]
     let index = getRandomNumber(0,colors.length);
-    listEle.style.backgroundColor = colors[index];
-    listEle.classList.add("listAlign");
-    listEle.id = value;
-    listEle.setAttribute("onclick","showStickersForSelectedTopic(this.id)");
-    let listName = document.createTextNode(value);
-    listEle.appendChild(listName);
+    let listEle = "<li class='listAlign' id='"+value+"' onclick='showStickersForSelectedTopic(this.id)' style='background-color:"+colors[index]+";'>"+value+"</li>"
     return listEle;
 }
 /**
@@ -374,25 +337,29 @@ function showStickersForSelectedTopic(searchTopic){
  * @param {*} data to render search related stickers.
  */
 function renderSearchStickers(data){
-    stickerEle = document.getElementById("stickerData");
+    var stickerEle = document.getElementById("stickerData");
     stickerEle.innerHTML="";
     stickerDetails = data.results || [];
     if(stickerDetails.length){
-        showStickers.style.display="grid";
+        let stickerChildEle="";
+        document.getElementById("showStickers").style.display="grid";
         document.getElementById("stickerHeading").textContent="Stickers";
         if(stickerDetails.length>5){
-            stickerMoveButton.style.display = "flex";
+            document.querySelector(".buttons").style.display = "flex";
         }
         else{
-            stickerMoveButton.style.display = "none";
+            document.querySelector(".buttons").style.display = "none";
         }
         stickerDetails.forEach((stickerInfo)=>{
-            let stickerChildEle = constructStickerElement(stickerInfo.media_formats.tinygif_transparent.url,stickerInfo.tags);
-            stickerEle.appendChild(stickerChildEle);
-        })
+            stickerChildEle += constructStickerElement(stickerInfo.media_formats.tinygif_transparent.url,stickerInfo.tags);
+        });
+        stickerEle.insertAdjacentHTML("beforeend",stickerChildEle);
+        root.style.setProperty("--stickerLeft","0%");
+        stickerNextClickCount = 1;
+        handleStickersPaginationUI();
     }
     else{
-        showStickers.style.display = "none";
+        document.getElementById("showStickers").style.display = "none";
     }
 }
 /**
@@ -402,18 +369,11 @@ function renderSearchStickers(data){
  * @returns element to append Stickers.
  */
 function constructStickerElement(imageUrl,tagNames){
-    let divEle = document.createElement("div");
-    let imgEle = document.createElement("img");
-
-    divEle.classList.add("stickerAlign")
-    imgEle.setAttribute("src",imageUrl);
-    imgEle.classList.add("stickerImg");
-    
-    divEle.appendChild(imgEle);
+    let ulElement="";
     if(tagNames){
-        let ulElement = constructHashTags(tagNames);
-        divEle.appendChild(ulElement);
+        ulElement = constructHashTags(tagNames);
     }
+    let divEle = "<div class='stickerAlign'><img src='"+imageUrl+"' class='stickerImg'>"+ulElement+"</div>"
 
     return divEle;
 }
@@ -423,18 +383,12 @@ function constructStickerElement(imageUrl,tagNames){
  * @returns element to append with Image
  */
 function constructHashTags(tagNames){
-    let ulEle = document.createElement("ul");
-        ulEle.classList.add("tagsParent");
-        tagNames.forEach((tag) => {
-            let liEle = document.createElement("li");
-            liEle.classList.add("tagList");
-            liEle.id=tag;
-            liEle.setAttribute("onclick","showSelectedStickersAndGifs(this.id)");
-            let liText = document.createTextNode("#"+tag);
-            liEle.appendChild(liText);
-            ulEle.appendChild(liEle);
-        })
-        return ulEle;
+    let liEle="";
+    tagNames.forEach((tag) =>{
+        liEle += "<li class='tagList' id='"+tag+"' onclick='showSelectedStickersAndGifs(this.id)'>#"+tag+"</li>"
+    });
+    let ulEle = "<ul class='tagsParent'>"+liEle+"</ul>"
+    return ulEle;
 }
 /**
  * 
@@ -444,37 +398,13 @@ function showSelectedStickersAndGifs(selectedTag){
     searchEle.value= selectedTag;
     searchBtnEle.click();
 }
-/**
- * To get Sticker element width value for carousel.
- */
-function getStickerWidthValue(){
-    stickerParentWidth = stickerEle.offsetWidth;
-    stickerLeftValue = parseInt(rootCS.getPropertyValue("--stickerLeft"));
-}
-/**
- * To move next data of searched Stickers.
- */
-function moveNextStickers(){
-    getStickerWidthValue();
-    let newValue = stickerLeftValue - stickerParentWidth;
-    root.style.setProperty("--stickerLeft",newValue);
-    stickerNextClickCount++;
-    handleStickersPaginationUI();
-}
-/**
- * To move previous data of searched stickers.
- */
-function movePreviousStickers(){
-    getStickerWidthValue();
-    let newValue = stickerLeftValue + stickerParentWidth;
-    root.style.setProperty("--stickerLeft",newValue);
-    stickerNextClickCount--;
-    handleStickersPaginationUI();
-}
+
 /**
  * To handle next and previous button of Stickers.
  */
 function handleStickersPaginationUI(){
+    var stickerPrevButton = document.getElementById("prevSticker");
+    var stickerNextButton = document.getElementById("nextSticker");
     if(stickerNextClickCount>1){
         stickerPrevButton.style.pointerEvents="all";
         stickerPrevButton.style.opacity ="1";
@@ -493,9 +423,59 @@ function handleStickersPaginationUI(){
     }
 }
 
+searchBtnEle.addEventListener("click",renderSearchItem);
+
 searchEle.addEventListener("keypress",function(event){
     if(event.key === "Enter"){
       event.preventDefault();
       searchBtnEle.click();
     }
+});
+
+searchEle.addEventListener("keyup", function(event){
+    clearTimeout(timeout);
+    timeout = setTimeout(function(){
+        searchBtnEle.click();
+    },1000);
+});
+
+/**
+ * To move next data of trending Gif.
+ */
+document.getElementById("nextGif").addEventListener("click", function(){
+    let newValue = parseInt(rootCS.getPropertyValue("--trendingLeft")) + (-100);
+    root.style.setProperty("--trendingLeft",newValue+"%");
+    nextClickCount++;
+    handleTrendyGifsPaginationUI();
+
+});
+
+/**
+ * To move Previous data of trending Gif.
+ */
+document.getElementById("prevGif").addEventListener("click", function(){
+    let newValue = parseInt(rootCS.getPropertyValue("--trendingLeft")) + 100;
+    root.style.setProperty("--trendingLeft",newValue+"%");
+    nextClickCount--;
+    handleTrendyGifsPaginationUI();
+});
+
+/**
+ * To move next data of searched Stickers.
+ */
+document.getElementById("nextSticker").addEventListener("click", function(){
+    let newValue = parseInt(rootCS.getPropertyValue("--stickerLeft")) + (-100);
+    root.style.setProperty("--stickerLeft",newValue+"%");
+    stickerNextClickCount++;
+    handleStickersPaginationUI();
+});
+ 
+/**
+ * To move previous data of searched stickers.
+ */
+document.getElementById("prevSticker").addEventListener("click", function(){
+    let newValue = parseInt(rootCS.getPropertyValue("--stickerLeft")) + 100;
+    root.style.setProperty("--stickerLeft",newValue+"%");
+    stickerNextClickCount--;
+    handleStickersPaginationUI();
 });
