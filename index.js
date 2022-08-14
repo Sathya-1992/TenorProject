@@ -60,10 +60,18 @@ function init(){
         let searchEle = document.getElementById("searchInput");
         searchEle.value = decodeURIComponent(queryParamObject['filter']); 
         renderSearchItem(queryParamObject.filter);
+    }else{
+        searchEle.value = "";
+        document.getElementById("homePage").style.display = "grid";
+        document.getElementById("searchPage").style.display = "none";
     }
 }
 
- window.onload = function(){
+window.goToHomePage = function(){
+    window.location.hash="#home";
+}
+
+window.onload = function(){
      init();
 };
 
