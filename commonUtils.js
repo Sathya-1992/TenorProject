@@ -3,6 +3,10 @@ export function getRandomNumber(min,max){
     return index;
 }
 
+export function changeHash(newHash){
+    window.location.hash = newHash;
+}
+
 export function constructHashTags(tagNames){
     let liEle="";
     tagNames.forEach((tag) =>{

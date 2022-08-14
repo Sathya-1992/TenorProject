@@ -1,6 +1,7 @@
 import { fetchTrendingGifs, renderTrendyGifs } from "./trending.js";
 import { fetchSearchStickers, fetchSearchTags, renderSearchStickers, renderSearchTags } from "./stickers.js";
 import { fetchFeaturedGifs, fetchSearchGifs, renderGifs } from "./gifs.js";
+import { changeHash } from "./commonUtils.js";
 
 
 let searchEle = document.getElementById("searchInput");
@@ -16,16 +17,54 @@ window.featuredGifElements = [];
 
 var timeout;
 
+
+function splitHashAndQueryParams(hash){
+    let splittedValue = hash.split("?");
+    return {
+        hash : splittedValue[0],
+        queryParams : splittedValue[1]
+    };
+}
+
+function constructQueryParamGroup(queryParams){
+    let splittedParams = queryParams.split("&");
+    let object = {};
+    for(let i=0;i<splittedParams.length;i++){
+        let param = splittedParams[i];
+        let splitParam = param.split("=");
+        object = Object.assign(object, {
+            [splitParam[0]] : splitParam[1]
+        })
+    }
+    return object;
+}
+
 /**
  * To render all trending tenor anf Gifs.
  */
- window.onload = function(){
+
+function init(){
     let trendingGif = fetchTrendingGifs();
     let featuredGif = fetchFeaturedGifs();
     Promise.all([trendingGif, featuredGif]).then((data) =>{
         renderTrendyGifs(data[0]);
         renderGifs(data[1], "featured");
     });
+
+    let {hash, queryParams} = splitHashAndQueryParams(window.location.hash);
+    if(window.location.hash == ""){
+        history.replaceState(null, null, document.location.pathname + '#home');
+    }
+    if(hash === "#search"){
+        let queryParamObject = constructQueryParamGroup(queryParams);
+        let searchEle = document.getElementById("searchInput");
+        searchEle.value = decodeURIComponent(queryParamObject['filter']); 
+        renderSearchItem(queryParamObject.filter);
+    }
+}
+
+ window.onload = function(){
+     init();
 };
 
 function emptyGifElementColumns(){
@@ -35,13 +74,13 @@ function emptyGifElementColumns(){
 }
 
 
-function renderSearchItem(){
+function renderSearchItem(searchValue){
 
     emptyGifElementColumns();
     document.getElementById("homePage").style.display = "none";
     document.getElementById("searchPage").style.display = "grid";
     
-    let searchValue = searchEle.value;
+    searchValue = searchValue || searchEle.value;
 
     let tags = fetchSearchTags(searchValue);
     let stickers = fetchSearchStickers(searchValue);
@@ -54,7 +93,15 @@ function renderSearchItem(){
     });  
 }
 
-searchBtnEle.addEventListener("click",renderSearchItem);
+
+window.addEventListener("hashchange",function(){
+    init();
+})
+
+searchBtnEle.addEventListener("click",function(){
+    changeHash("#search?filter="+searchEle.value);
+    renderSearchItem();
+});
 
 searchEle.addEventListener("keypress",function(event){
     if(event.key === "Enter"){
