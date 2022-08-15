@@ -151,18 +151,33 @@ img[alt="search"]{
 #tenor{
     height: 14rem;
     margin: 0 -1rem;
+    overflow: hidden;
+    display: flex;
+    justify-content: flex-start;
+    position: relative;
+    white-space: nowrap;
 }
 #parentTenor{
-    transform : translateX(var(--trendingLeft))
-}
-.tenorDiv{
-    width: 100%;
-    display: inline-block;
-}
-#parentTenor,#stickerData{
     position: absolute;
     transition: transform .3s linear;
+    width: 1000%;
+    display: flex;
+    height: 100%;
+    flex-shrink: 0;
+    transform : translateX(var(--trendingLeft));
+}
+.tenorDiv{
+    flex-basis: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 100%;
+    flex-shrink: 0;
+}
+#stickerData{
+    position: absolute;
+    transition: transform .3s linear;
+    width: 100%; 
 }
 .imageAlign,.stickerAlign{
     display: inline-block;
@@ -196,7 +211,6 @@ img[alt="search"]{
 }
 .prevButton{
     left: -2.5rem;
-    display: none;
 }
 .nextButton{
     right: -2.5rem;

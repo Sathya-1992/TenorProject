@@ -1,18 +1,17 @@
 import { handleSearchTrendingGifs } from "./action.js";
-import { rootCS, rootElement } from "./index.js";
+import { rootElement } from "./index.js";
 
-let trendingGifs = [], nextClickCount=1;
+let trendingGifs = [];
 let trendingEle = document.getElementById("parentTenor");
-
+let direction;
 
 /**
  * To move next data of trending Gif.
  */
  document.getElementById("nextTrendingGifs").addEventListener("click", function(){
-    let newValue = parseInt(rootCS.getPropertyValue("--trendingLeft")) + (-100);
-    rootElement.style.setProperty("--trendingLeft",newValue+"%");
-    nextClickCount++;
-    handleTrendyGifsPaginationUI();
+    direction = -1;
+    document.getElementById("tenor").style.justifyContent = 'flex-start';
+    rootElement.style.setProperty("--trendingLeft","-10%");
 
 });
 
@@ -20,24 +19,52 @@ let trendingEle = document.getElementById("parentTenor");
  * To move Previous data of trending Gif.
  */
 document.getElementById("prevTrendingGifs").addEventListener("click", function(){
-    let newValue = parseInt(rootCS.getPropertyValue("--trendingLeft")) + 100;
-    rootElement.style.setProperty("--trendingLeft",newValue+"%");
-    nextClickCount--;
-    handleTrendyGifsPaginationUI();
+    if(direction === -1){
+        direction = 1;
+        trendingEle.appendChild(trendingEle.firstElementChild);
+    }
+    document.getElementById("tenor").style.justifyContent = 'flex-end';
+    rootElement.style.setProperty("--trendingLeft","10%");
 });
+
+trendingEle.addEventListener("transitionend", function(){
+    if(direction === 1){
+        trendingEle.prepend(trendingEle.lastElementChild);
+    }
+    else{
+        trendingEle.appendChild(trendingEle.firstElementChild);
+    }
+    trendingEle.style.transition = 'none';
+    rootElement.style.setProperty("--trendingLeft","0%");
+    setTimeout(() =>{
+        trendingEle.style.transition = 'all 0.5s linear';
+    });
+
+},false);
 
 export function fetchTrendingGifs(){
     return handleSearchTrendingGifs()
 }
 
 export function renderTrendyGifs(data){
-    let tagElement="", trendId = 1;
+    let tagElement="";
     trendingGifs = data.tags || [];
-    trendingGifs.forEach((gifInfo)=>{
-        tagElement += constructTrendingGifElement(gifInfo.searchterm,gifInfo.image,trendId);
-        trendId++;
-    });
+    for(let i=0;i<(trendingGifs.length)/5;i++){
+        let num = i*5;
+        tagElement+=constructParentToTrendingGif(trendingGifs.slice(num,(5+num)));
+    }
+    
     trendingEle.insertAdjacentHTML("beforeend",tagElement);
+}
+
+function constructParentToTrendingGif(trendingGifs){
+    let parentEle = "<div class='tenorDiv'>";
+    trendingGifs.forEach((gifInfo)=>{
+        parentEle += constructTrendingGifElement(gifInfo.searchterm,gifInfo.image);
+    });
+    parentEle+="</div>";
+    
+    return parentEle;
 }
 
 /**
@@ -46,27 +73,9 @@ export function renderTrendyGifs(data){
  * @param {*} imageUrl to show image Gif
  * @returns element to append.
  */
- function constructTrendingGifElement(imageName,imageUrl,trendId){
+ function constructTrendingGifElement(imageName,imageUrl){
     let divEle = "<div class='imageAlign' id='"+imageName+"' onclick='showSelectedTopic(this.id)'><img src='"+imageUrl+"' class='trendingGif'><div class='imgNameAlign'>"+imageName+"</div></div>";
     return divEle;
-}
-
-
-function handleTrendyGifsPaginationUI(){
-    var nextButton = document.getElementById("nextTrendingGifs");
-    var prevButton = document.getElementById("prevTrendingGifs");
-    if(nextClickCount>1){
-        prevButton.style.display="block";
-    }
-    else if(nextClickCount==1){
-        prevButton.style.display="none";
-    }
-    if(nextClickCount===Math.ceil((trendingGifs.length/5))){
-        nextButton.style.display="none";
-    }
-    else if(nextClickCount<Math.ceil((trendingGifs.length/5))){
-        nextButton.style.display="block";
-    }
 }
 
 /**

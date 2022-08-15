@@ -3,6 +3,10 @@ export function getRandomNumber(min,max){
     return index;
 }
 
+export function changeHashSilently(newHash){
+    history.replaceState(null, null, document.location.pathname + newHash);
+}
+
 export function changeHash(newHash){
     window.location.hash = newHash;
 }

@@ -2,7 +2,7 @@ import { rootElement } from "./index.js";
 import { featuredGifsRequestHandler, gifSearchRequestHandler } from "./action.js";
 import { constructHashTags } from "./commonUtils.js";
 
-let featuredGifsFetchPosition = 0, searchGifsFetchPosition=0, gifsList = [], displayGifsFrom = 0, isFetchNextGifs=false;
+let featuredGifsFetchPosition = 0, searchGifsFetchPosition=0, gifsList = [], displayGifsFrom = 0, isFetchingGifs=false;
 
 let gifParentIndex = 0;
 
@@ -25,6 +25,7 @@ export function renderGifs(data, type){
         searchGifsFetchPosition = data.next;
     }
     gifsList = data.results || [];
+    displayGifsFrom = 0;
     insertGifsElements(type);
 }
 
@@ -73,7 +74,7 @@ containerElement.addEventListener("scroll", function(event){
 
     let containerScrollTop = event.target.scrollTop;
     let navElementHeight = document.getElementsByTagName("nav")[0].offsetHeight;
-    let scrollValue = containerElement.scrollHeight-containerElement.clientHeight-300;
+    let scrollValue = containerElement.scrollHeight-containerElement.clientHeight-200;
     if(containerScrollTop > navElementHeight){
         rootElement.style.setProperty("--inputPosition","9rem");
     } 
@@ -81,17 +82,17 @@ containerElement.addEventListener("scroll", function(event){
         rootElement.style.setProperty("--inputPosition","0");
     }
 
-    if(containerScrollTop >= scrollValue && !isFetchNextGifs){
+    if(containerScrollTop >= scrollValue && !isFetchingGifs){
         if(isSearch){
             if(displayGifsFrom === 0){
                 displayGifsFrom = 25;
                 insertGifsElements("search", true);
             }
             else{
-                isFetchNextGifs = true;
+                isFetchingGifs = true;
                 gifSearchRequestHandler(searchEle.value, searchGifsFetchPosition).then((res)=>{
                     searchGifsFetchPosition = res.next;
-                    isFetchNextGifs = false;
+                    isFetchingGifs = false;
                     renderGifs(res, "search");
                 });
             }
@@ -101,10 +102,10 @@ containerElement.addEventListener("scroll", function(event){
                 insertGifsElements("featured", true);
             }
             else{
-                isFetchNextGifs = true;
+                isFetchingGifs = true;
                 featuredGifsRequestHandler(featuredGifsFetchPosition).then((res)=>{
                     featuredGifsFetchPosition = res.next;
-                    isFetchNextGifs = false;
+                    isFetchingGifs = false;
                     renderGifs(res, "featured");
                 });
             }  
