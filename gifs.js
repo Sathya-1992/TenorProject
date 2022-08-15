@@ -66,7 +66,9 @@ function insertGifsElements(type){
     return divEle;
 }
 
-
+/**
+ * OnScroll Functions
+ */
 let containerElement = document.getElementById('container');
 containerElement.addEventListener("scroll", function(event){
     let searchEle = document.getElementById("searchInput");

@@ -3,7 +3,6 @@ import { fetchSearchStickers, fetchSearchTags, renderSearchStickers, renderSearc
 import { fetchFeaturedGifs, fetchSearchGifs, renderGifs } from "./gifs.js";
 import { changeHashSilently } from "./commonUtils.js";
 
-
 let searchEle = document.getElementById("searchInput");
 let searchBtnEle = document.getElementById("searchBtn");
 
@@ -15,9 +14,7 @@ export const rootCS = getComputedStyle(root);
 
 window.featuredGifElements = [];
 
-
 var timeout;
-
 
 function splitHashAndQueryParams(hash){
     let splittedValue = hash.split("?");
@@ -105,7 +102,6 @@ function renderSearchItem(searchValue){
         isSearchFetching = false;
     });  
 }
-
 
 window.addEventListener("hashchange",function(){
     init();

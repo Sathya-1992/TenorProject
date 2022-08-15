@@ -10,7 +10,6 @@ export function fetchSearchTags(searchValue){
     return handleSearchSuggestion(searchValue)
 }
 
-
 /**
  * 
  * @param {*} data to render the sticker suggestion topic.
@@ -37,7 +36,6 @@ function constructSearchSuggestionElement(value){
     let listEle = "<li class='listAlign' id='"+value+"' onclick='showStickersForSelectedTopic(this.id)' style='background-color:"+colors[index]+";'>"+value+"</li>"
     return listEle;
 }
-
 /**
  * 
  * @param {*} searchTopic to search based on this topic
@@ -119,7 +117,6 @@ export function renderSearchStickers(data){
         stickerNextButton.style.opacity ="1";
     }
 }
-
 
 /**
  * To move next data of searched Stickers.
