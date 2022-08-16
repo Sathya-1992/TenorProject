@@ -211,6 +211,7 @@ img[alt="search"]{
 }
 .prevButton{
     left: -2.5rem;
+    display: none;
 }
 .nextButton{
     right: -2.5rem;

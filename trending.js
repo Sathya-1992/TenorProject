@@ -9,10 +9,13 @@ let direction;
  * To move next data of trending Gif.
  */
  document.getElementById("nextTrendingGifs").addEventListener("click", function(){
+    if(direction === 1){
+        trendingEle.prepend(trendingEle.lastElementChild);
+    }
     direction = -1;
     document.getElementById("tenor").style.justifyContent = 'flex-start';
     rootElement.style.setProperty("--trendingLeft","-10%");
-
+    document.getElementById("prevTrendingGifs").style.display = "block";
 });
 
 /**
